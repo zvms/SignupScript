@@ -1,14 +1,14 @@
-interface Class {
+export interface Class {
   id: number;
   name: string;
   students: number[];
 }
-interface Grade {
+export interface Grade {
   id: number;
   name: string;
   classes: Class[];
 }
-interface MetaData {
+export interface MetaData {
   grades: Grade[];
   current: number[];
   neo: number;
@@ -47,6 +47,7 @@ export function tokenlizer(source: string): Token[] {
         }
       }
       current = char;
+      last = type;
     }
   }
   tokens.push(last === "number" ? parseInt(current) : current);
@@ -114,7 +115,7 @@ function eval4(ctx: Context, tokens: Token[], metadata: MetaData): boolean {
   if (i === -1) {
     const v = eval3(ctx, tokens, metadata);
     if (typeof v === "number") {
-      throw new Error("invalid operation");
+      return v > 0;
     }
     return v;
   }
@@ -152,7 +153,7 @@ function eval3(
     if (typeof v === "boolean" || typeof v === "number") {
       return v;
     }
-    throw v.length;
+    return v.length;
   }
   let left = eval2(ctx, tokens.slice(0, i), metadata);
   if (typeof left === "boolean") {
@@ -253,7 +254,7 @@ function isGradeID(metadata: MetaData, value: number): boolean {
 
 function isClassID(metadata: MetaData, value: number): [boolean, number] {
   const t = value > 200000 && value < 1000000;
-  const g = metadata.grades.findIndex((v) => v.id === value % 10000);
+  const g = metadata.grades.findIndex((v) => v.id === Math.floor(value / 100));
   return [t, g];
 }
 
@@ -262,9 +263,9 @@ function isStudentID(
   value: number
 ): [boolean, number, number] {
   const t = value > 20000000 && value < 100000000;
-  const g = metadata.grades.findIndex((v) => v.id === value % 10000);
+  const g = metadata.grades.findIndex((v) => v.id === Math.floor(value / 10000));
   const c = metadata.grades[g].classes.findIndex(
-    (v) => v.id === value % 1000000
+    (v) => v.id === Math.floor(value / 100)
   );
   return [t, g, c];
 }

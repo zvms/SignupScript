@@ -2,13 +2,15 @@
   "name": "SignupScript",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./types/index.js",
+  "types": "./types/index.d.ts",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "_Kerman",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@types/node": "^20.3.1",
     "prettier": "^2.8.8",
