@@ -1,0 +1,6 @@
+must current < 10
+must new in 2022
+just new in 202203
+a = current in 202203
+b = a + 10 - current
+must b >= 3
