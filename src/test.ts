@@ -29,6 +29,6 @@ const metadata: MetaData = {
   neo: 20220304,
 };
 
-const source = fs.readFileSync("../src/test.signup", "utf-8");
+const source = fs.readFileSync("../example.signup", "utf-8");
 
 console.log(run(source, metadata));
