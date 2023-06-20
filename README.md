@@ -8,20 +8,22 @@ The SingupScript for ZVMS.
   return `false` if `<expr>` is `false`, otherwise continue
 - `just <expr>`
   return `true` if `<expr>` is `true`, otherwise continue
+- `return <expr>`
+  return `<expr>` and stop
 - assignment: `<id> = <expr>`
   e.g. `new = current & 202203`
 - comment: `# <comment>`
 
-If the program reaches the end, it returns `true`.
+If the program reaches the end, it implicitly executes `return true`.
 
 ## Operators
 
 > by priority
 
 1. union: `&`(alias: `in`), `|`
-   e.g. `20220301 in current`
-   e.g. `202203 | 202204`
-   e.g. `current & 202203`
+   e.g. `20220301 in current` -> {`20220301`} or {}
+   e.g. `202203 | 202204` -> {`20220301`, `20220302`, ..., `20220401`, `20220402`, ...}
+   e.g. `current & 202203` -> (maybe){`20220320`, `20220321`}
 2. algebra: `+`, `-`
 3. comparison: `==`, `!=`, `>`, `>=`, `<`, `<=`
 4. logic: `&&`, `||`
@@ -43,8 +45,8 @@ If the program reaches the end, it returns `true`.
 ## Implicit Conversion
 
 - any id is always converted to union
-  e.g. `202203`->`{20220301, 20220302, ... }`
-  e.g. `20220320`->`{20220320}`
+  e.g. `202203` -> {`20220301`, `20220302`, ... }
+  e.g. `20220320` -> {`20220320`}
 - union is converted to int by its size when doing algebra
   e.g. `202203 + 1`->`46`
   e.g. `10 - current`->`3`
@@ -56,8 +58,13 @@ If the program reaches the end, it returns `true`.
 
 ### Input
 
-- `current`: union of students who has signed up
+- `before`: union of students who has signed up
+  e.g. {`20220101`, `20220202`}
 - `new`: student who wants to sign up
+  e.g. `20220303`
+- `after`: union of students who has signed up after the new student signs up
+  definition: `final = initial | delta`
+  e.g. {`20220101`, `20220202`, `20220303`}
 
 ### Output
 
@@ -65,4 +72,9 @@ If the program reaches the end, it returns `true`.
 
 ## Examples
 
-See [`./example.signup`](./example.signup).
+See [`example.signup`](./example.signup).
+
+
+## AST Structure
+
+See [`ast.d.ts`](./ast.d.ts).
