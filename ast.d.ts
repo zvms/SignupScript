@@ -19,6 +19,7 @@ type BooleanNode = ASTNode<boolean>;
 type Context = Record<string, any>;
 
 interface Program extends BooleanNode {
+  type: "program";
   statements: Statement[];
 }
 
@@ -53,15 +54,16 @@ interface AssignmentStatement extends VoidNode {
 
 interface UnionLiteral extends UnionNode {
   type: "union-literal";
+  value: UnionOfStundents;
 }
 interface NumericLiteral extends IntNode {
   type: "numeric-literal";
-  ASTNode: number;
+  value: number;
 }
 interface Id<Ctx extends Context, Id extends keyof Ctx>
   extends ASTNode<Ctx[Id]> {
   type: "id";
-  ASTNode: string;
+  value: string;
 }
 
 interface UnionKindExpr<N extends string> extends UnionNode {
@@ -120,7 +122,29 @@ type IntToBooleanExpr = ConverionKindExpr<
   BooleanNode
 >;
 
+type AllNodes =
+  | Program
+  | Statement
+  | UnionLiteral
+  | NumericLiteral
+  | Id<any,any>
+  | UnionExpr
+  | IntersectExpr
+  | AddExpr
+  | SubExpr
+  | EqExpr
+  | NeExpr
+  | GtExpr
+  | GeExpr
+  | LtExpr
+  | LeExpr
+  | NotExpr
+  | AndExpr
+  | OrExpr
+  | UnionToIntExpr
+  | IntToBooleanExpr;
 export {
+  AllNodes,
   Program,
   Statement,
   MustStatement,
