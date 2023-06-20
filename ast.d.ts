@@ -23,11 +23,16 @@ interface Program extends BooleanNode {
 }
 
 type Statement =
+  | CommentStatement
   | MustStatement
   | JustStatement
   | ReturnStatement
   | AssignmentStatement;
 
+interface CommentStatement extends VoidNode {
+  type: "comment";
+  content: string;
+}
 interface MustStatement extends VoidNode {
   type: "must";
   expr: BooleanNode;
