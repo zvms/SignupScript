@@ -9,7 +9,7 @@ interface UnionOfStundents {
 
 interface ASTNode<T> {
   type: string;
-  getValue(): T;
+  eval(): T;
 }
 type VoidNode = ASTNode<void>;
 type UnionNode = ASTNode<UnionOfStundents>;
