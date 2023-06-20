@@ -76,6 +76,11 @@ type GeExpr = ComparisonKindExpr<'ge'>
 type LtExpr = ComparisonKindExpr<'lt'>
 type LeExpr = ComparisonKindExpr<'le'>
 
+interface NotExpr extends BooleanNode{
+    type: 'not'
+    expr: BooleanNode
+}
+
 interface LogicalKindExpr<N extends string> extends BooleanNode{
     type: N
     left: BooleanNode

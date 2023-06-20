@@ -26,7 +26,7 @@ If the program reaches the end, it implicitly executes `return true`.
    e.g. `current & 202203` -> (maybe){`20220320`, `20220321`}
 2. algebra: `+`, `-`
 3. comparison: `==`, `!=`, `>`, `>=`, `<`, `<=`
-4. logic: `&&`, `||`
+4. logic: `!`, `&&`, `||`
 
 ## Types
 
