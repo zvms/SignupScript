@@ -1,5 +1,9 @@
 import type * as ast from "../ast.d.ts";
 import { type MetaData } from "./index.js";
+import { readFileSync } from "node:fs";
+
+console.log(explain(JSON.parse(readFileSync("../dist/result.json","utf-8"))))
+
 
 export function explain(node0: ast.ASTNode<any>): string {
   const node = node0 as ast.AllNodes;
@@ -18,33 +22,33 @@ export function explain(node0: ast.ASTNode<any>): string {
       return explainUnion(node.value);
     case "numeric-literal":
       return `${node.value}`;
-    case "union":
+    case "|":
       return `要么${explain(node.left)}要么${explain(node.right)}`;
-    case "intersect":
+    case "&":
       return `既${explain(node.left)}又${explain(node.right)}`;
     case "id":
-      return `“${node.value}”`;
-    case "eq":
+      return `“${node.name}”`;
+    case "==":
       return `${explain(node.left)}等于${explain(node.right)}`;
-    case "ne":
+    case "!=":
       return `${explain(node.left)}不等于${explain(node.right)}`;
-    case "gt":
+    case ">":
       return `${explain(node.left)}大于${explain(node.right)}`;
-    case "ge":
+    case ">=":
       return `${explain(node.left)}大于等于${explain(node.right)}`;
-    case "lt":
+    case "<":
       return `${explain(node.left)}小于${explain(node.right)}`;
-    case "le":
+    case "<=":
       return `${explain(node.left)}小于等于${explain(node.right)}`;
-    case "not":
+    case "!":
       return `不满足${explain(node.expr)}`;
-    case "add":
+    case "+":
       return `${explain(node.left)}+${explain(node.right)}`;
-    case "sub":
+    case "-":
       return `${explain(node.left)}-${explain(node.right)}`;
-    case "and":
+    case "&&":
       return `${explain(node.left)}且${explain(node.right)}`;
-    case "or":
+    case "||":
       return `${explain(node.left)}或${explain(node.right)}`;
     case "union-to-int":
       return `${explain(node.from)}的人数`;

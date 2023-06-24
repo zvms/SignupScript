@@ -11,7 +11,7 @@ The SingupScript for ZVMS.
 - `return <expr>`
   return `<expr>` and stop
 - assignment: `<id> = <expr>`
-  e.g. `new = current & 202203`
+  e.g. `new = before & 202203`
 - comment: `# <comment>`
 
 If the program reaches the end, it implicitly executes `return true`.
@@ -21,9 +21,9 @@ If the program reaches the end, it implicitly executes `return true`.
 > by priority
 
 1. union: `&`(alias: `in`), `|`
-   e.g. `20220301 in current` -> {`20220301`} or {}
+   e.g. `20220301 in before` -> {`20220301`} or {}
    e.g. `202203 | 202204` -> {`20220301`, `20220302`, ..., `20220401`, `20220402`, ...}
-   e.g. `current & 202203` -> (maybe){`20220320`, `20220321`}
+   e.g. `before & 202203` -> (maybe){`20220320`, `20220321`}
 2. algebra: `+`, `-`
 3. comparison: `==`, `!=`, `>`, `>=`, `<`, `<=`
 4. logic: `!`, `&&`, `||`
@@ -49,8 +49,9 @@ If the program reaches the end, it implicitly executes `return true`.
   e.g. `20220320` -> {`20220320`}
 - union is converted to int by its size when doing algebra
   e.g. `202203 + 1`->`46`
-  e.g. `10 - current`->`3`
-- int is converted to boolean by whether it is zero
+  e.g. `10 - before`->`3`
+- int is converted to boolean by whether it greater than zero
+  e.g. `-3`->`false`
   e.g. `0`->`false`
   e.g. `3`->`true`
 

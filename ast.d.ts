@@ -63,7 +63,7 @@ interface NumericLiteral extends IntNode {
 interface Id<Ctx extends Context, Id extends keyof Ctx>
   extends ASTNode<Ctx[Id]> {
   type: "id";
-  value: string;
+  name: string;
 }
 
 interface UnionKindExpr<N extends string> extends UnionNode {
@@ -71,31 +71,31 @@ interface UnionKindExpr<N extends string> extends UnionNode {
   left: UnionNode;
   right: UnionNode;
 }
-type UnionExpr = UnionKindExpr<"union">;
-type IntersectExpr = UnionKindExpr<"intersect">;
+type UnionExpr = UnionKindExpr<"&">;
+type IntersectExpr = UnionKindExpr<"|">;
 
 interface AlgebraKindExpr<N extends string> extends IntNode {
   type: N;
   left: IntNode;
   right: IntNode;
 }
-type AddExpr = AlgebraKindExpr<"add">;
-type SubExpr = AlgebraKindExpr<"sub">;
+type AddExpr = AlgebraKindExpr<"+">;
+type SubExpr = AlgebraKindExpr<"-">;
 
 interface ComparisonKindExpr<N extends string> extends BooleanNode {
   type: N;
   left: IntNode;
   right: IntNode;
 }
-type EqExpr = ComparisonKindExpr<"eq">;
-type NeExpr = ComparisonKindExpr<"ne">;
-type GtExpr = ComparisonKindExpr<"gt">;
-type GeExpr = ComparisonKindExpr<"ge">;
-type LtExpr = ComparisonKindExpr<"lt">;
-type LeExpr = ComparisonKindExpr<"le">;
+type EqExpr = ComparisonKindExpr<"==">;
+type NeExpr = ComparisonKindExpr<"!=">;
+type GtExpr = ComparisonKindExpr<">">;
+type GeExpr = ComparisonKindExpr<">=">;
+type LtExpr = ComparisonKindExpr<"<">;
+type LeExpr = ComparisonKindExpr<"<=">;
 
 interface NotExpr extends BooleanNode {
-  type: "not";
+  type: "!";
   expr: BooleanNode;
 }
 
@@ -104,8 +104,8 @@ interface LogicalKindExpr<N extends string> extends BooleanNode {
   left: BooleanNode;
   right: BooleanNode;
 }
-type AndExpr = LogicalKindExpr<"and">;
-type OrExpr = LogicalKindExpr<"or">;
+type AndExpr = LogicalKindExpr<"&&">;
+type OrExpr = LogicalKindExpr<"||">;
 
 type ConverionKindExpr<
   N extends string,
