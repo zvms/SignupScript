@@ -1,8 +1,10 @@
 # max 10 persons, and 202203 must has 3 persons.
-must current < 10
+must before < 10
 must new in 2022
 just new in 202203
-a = current in 202203
-b = a + 10 - current
+a = before in 202203
+b = a + 10 - before
 must b >= 3
 # ok!
+
+#return -1+-1-+5==-7

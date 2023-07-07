@@ -38,8 +38,8 @@ If the program reaches the end, it implicitly executes `return true`.
 
 - `[0,2000]`: number itself
 - `(2000,10000)`: grade id
-- `[10000,1000000)`: class id
-- `[1000000,1000000000)`: student id
+- `[100000,1000000)`: class id
+- `[10000000,1000000000)`: student id
 - otherwise: invalid
 
 ## Implicit Conversion

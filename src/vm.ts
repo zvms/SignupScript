@@ -25,7 +25,12 @@ export class VM {
           returns(true);
         }
       case "return":
-        returns(this.eval(node.expr));
+        const result = this.eval(node.expr);
+        if (typeof result === "boolean") {
+          returns(result);
+        } else {
+          throw new Error("return value must be boolean");
+        }
       case "assignment":
         this.ctx[node.id] = this.eval(node.expr);
     }
@@ -42,31 +47,63 @@ export class VM {
       case "||":
         return this.eval(node.left) || this.eval(node.right);
       case "+":
-        return (this.eval(node.left) as number) + (this.eval(node.right) as number);
+        return (
+          (this.eval(node.left) as number) + (this.eval(node.right) as number)
+        );
       case "-":
-        return  (this.eval(node.left) as number) - (this.eval(node.right) as number);
+        return (
+          (this.eval(node.left) as number) - (this.eval(node.right) as number)
+        );
       case "&":
-        return 
+        return Union.intersect(
+          this.eval(node.left) as Union,
+          this.eval(node.right) as Union
+        );
       case "|":
+        return Union.union(
+          this.eval(node.left) as Union,
+          this.eval(node.right) as Union
+        );
       case "==":
+        return this.eval(node.left) === this.eval(node.right);
       case "!=":
+        return this.eval(node.left) !== this.eval(node.right);
       case ">":
+        return (
+          (this.eval(node.left) as number) > (this.eval(node.right) as number)
+        );
       case "<":
+        return (
+          (this.eval(node.left) as number) < (this.eval(node.right) as number)
+        );
       case ">=":
+        return (
+          (this.eval(node.left) as number) >= (this.eval(node.right) as number)
+        );
       case "<=":
+        return (
+          (this.eval(node.left) as number) <= (this.eval(node.right) as number)
+        );
       case "!":
+        return !(this.eval(node.expr) as boolean);
       case "id":
+        if(!(node.name in this.ctx)) throw new Error(`unknown variable: ${node.name}`);
+        return this.ctx[node.name];
       case "numeric-literal":
+        return node.value;
       case "union-literal":
+        return Union.fromLiteral(node.value);
+      default:
+        throw new Error(`unknown node type: ${(node as ASTNode).type}`);
     }
   }
 
-  static run(program: ASTNode[], before: Union, neo: Student) {
-    const after = Union.add(before, neo);
+  static run(program: Statement[], before: Union, neo: Student) {
+    const after = Union.addStudnet(before, neo);
     const vm = new VM();
     vm.ctx = {
       before,
-      neo,
+      new: new Union(new Set(), new Set(), new Set([neo])),
       after,
     };
     try {

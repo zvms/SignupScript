@@ -1,85 +1,89 @@
-import type * as ast from "../ast.d.ts";
-import { type MetaData } from "./index.js";
-import { readFileSync } from "node:fs";
+import { ASTNode, Statement } from "./parser.js";
+import { Union } from "./student.js";
 
-console.log(explain(JSON.parse(readFileSync("../dist/result.json","utf-8"))))
-
-
-export function explain(node0: ast.ASTNode<any>): string {
-  const node = node0 as ast.AllNodes;
-  switch (node.type) {
+export function explainStatement(statement: Statement) {
+  switch (statement.type) {
     case "must":
-      return `必须${explain(node.expr)}才可以报名`;
+      return `必须${explainExpr(statement.expr)}才可以报名`;
     case "just":
-      return `只要${explain(node.expr)}就可以报名`;
+      return `只要${explainExpr(statement.expr)}就可以报名`;
     case "return":
-      return `返回${explain(node.expr)}`;
+      return `返回${explainExpr(statement.expr)})`;
     case "assignment":
-      return `“${node.id}”是${explain(node.expr)}`;
+      return `“${statement.id}”是${explainExpr(statement.expr)}`;
     case "comment":
       return "";
+  }
+}
+
+export function explainExpr(node: ASTNode): string {
+  switch (node.type) {
     case "union-literal":
-      return explainUnion(node.value);
+      return explainUnion(Union.fromLiteral(node.value));
     case "numeric-literal":
       return `${node.value}`;
     case "|":
-      return `要么${explain(node.left)}要么${explain(node.right)}`;
+      return `(要么${explainExpr(node.left)}要么${explainExpr(node.right)})`;
     case "&":
-      return `既${explain(node.left)}又${explain(node.right)}`;
+      return `(既${explainExpr(node.left)}又${explainExpr(node.right)})`;
     case "id":
-      return `“${node.name}”`;
+      return `属于“${node.name}”`;
     case "==":
-      return `${explain(node.left)}等于${explain(node.right)}`;
+      return `(${explainExpr(node.left)}等于${explainExpr(node.right)})`;
     case "!=":
-      return `${explain(node.left)}不等于${explain(node.right)}`;
+      return `(${explainExpr(node.left)}不等于${explainExpr(node.right)})`;
     case ">":
-      return `${explain(node.left)}大于${explain(node.right)}`;
+      return `(${explainExpr(node.left)}大于${explainExpr(node.right)})`;
     case ">=":
-      return `${explain(node.left)}大于等于${explain(node.right)}`;
+      return `(${explainExpr(node.left)}大于等于${explainExpr(node.right)})`;
     case "<":
-      return `${explain(node.left)}小于${explain(node.right)}`;
+      return `(${explainExpr(node.left)}小于${explainExpr(node.right)})`;
     case "<=":
-      return `${explain(node.left)}小于等于${explain(node.right)}`;
+      return `(${explainExpr(node.left)}小于等于${explainExpr(node.right)})`;
     case "!":
-      return `不满足${explain(node.expr)}`;
+      return `(不满足${explainExpr(node.expr)})`;
     case "+":
-      return `${explain(node.left)}+${explain(node.right)}`;
+      return `(${explainExpr(node.left)}+${explainExpr(node.right)})`;
     case "-":
-      return `${explain(node.left)}-${explain(node.right)}`;
+      return `(${explainExpr(node.left)}-${explainExpr(node.right)})`;
     case "&&":
-      return `${explain(node.left)}且${explain(node.right)}`;
+      return `(${explainExpr(node.left)}且${explainExpr(node.right)})`;
     case "||":
-      return `${explain(node.left)}或${explain(node.right)}`;
+      return `(${explainExpr(node.left)}或${explainExpr(node.right)})`;
     case "union-to-int":
-      return `${explain(node.from)}的人数`;
+      return `${explainExpr(node.from)}的人数`;
     case "int-to-boolean":
-      return `${explain(node.from)}大于0`;
-    case "program":
-      throw new Error("Program node should not be explained");
+      return `${explainExpr(node.from)}大于0`;
     default:
       const _: never = node;
       throw new Error(`Unknown node type: ${node["type"]}`);
   }
 }
 
-function explainUnion(value: ast.UnionOfStundents): string {
+function explainUnion(value: Union): string {
   let prefix = "属于";
   if (
-    value.individuals.length === 1 &&
-    value.grades.length === 0 &&
-    value.classes.length === 0
+    (value.students.size === 1 &&
+      value.grades.size === 0 &&
+      value.classes.size === 0) ||
+    (value.students.size === 0 &&
+      value.grades.size === 1 &&
+      value.classes.size === 0) ||
+    (value.students.size === 0 &&
+      value.grades.size === 0 &&
+      value.classes.size === 1)
   ) {
     prefix = "是";
   }
   let result = [];
-  if (value.individuals.length > 0) {
-    result.push(value.individuals.join("/"));
+  if (value.students.size > 0) {
+    result.push([...value.students].join("/"));
   }
-  if (value.grades.length > 0) {
-    result.push(value.grades.join("/"));
+  if (value.grades.size > 0) {
+    result.push([...value.grades].join("/"));
   }
-  if (value.classes.length > 0) {
-    result.push(value.classes.join("/"));
+  if (value.classes.size > 0) {
+    result.push([...value.classes].join("/"));
   }
-  return result.join("or");
+  return prefix + result.join("or");
 }

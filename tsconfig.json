@@ -6,9 +6,9 @@
     "outDir": "dist",
     "declaration": true,
     "sourceMap": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "Node",
     "lib": ["ESNext"],
-    "types": ["node"],
+    "types": ["node","antlr4"],
     "strict": true,
     "esModuleInterop": true
   }

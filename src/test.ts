@@ -1,7 +1,11 @@
-import { type MetaData, run } from "./index.js";
+import { explainStatement } from "./explain.js";
+import { Parser } from "./parser.js";
+import { Union } from "./student.js";
+import { VM } from "./vm.js";
+
 import fs from "node:fs";
 
-const metadata: MetaData = {
+const metadata = {
   grades: [
     {
       name: "高一",
@@ -31,4 +35,24 @@ const metadata: MetaData = {
 
 const source = fs.readFileSync("../example.signup", "utf-8");
 
-console.log(run(source, metadata));
+const program = Parser.parse(source);
+
+console.log(program);
+
+fs.writeFileSync("../example.ast.json", JSON.stringify(program, null, 2));
+
+
+const explaination = program.map((statement) => explainStatement(statement));
+
+console.log(explaination);
+
+fs.writeFileSync("../example.explaination.txt", explaination.join("\n"));
+
+
+const result = VM.run(
+  program,
+  new Union(new Set([20220101, 20220203, 20220303]), new Set(), new Set()),
+  20220304
+);
+
+console.log(result);

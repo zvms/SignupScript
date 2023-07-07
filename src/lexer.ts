@@ -7,7 +7,7 @@ export class Lexer {
   }
   protected rawTokens: string[] = [];
   protected get lastRawToken() {
-    return this.rawTokens[this.rawTokens.length - 1];
+    return this.rawTokens[this.rawTokens.length - 1] ?? "";
   }
   protected set lastRawToken(token: string) {
     this.rawTokens[this.rawTokens.length - 1] = token;
@@ -42,13 +42,14 @@ export class Lexer {
     ) {
       this.rawTokens.push(char);
     } else {
-      if (/[a-zA-Z0-9]/.test(this.lastRawToken)) {
-        this.lastRawToken = this.rawTokens.at(-1) + char;
+      if (/^[a-zA-Z0-9]+$/.test(this.lastRawToken)) {
+        this.lastRawToken = this.lastRawToken + char;
       } else {
         this.rawTokens.push(char);
       }
     }
   }
+
   run(source: string) {
     for (const c of source) {
       this.process(c);
@@ -62,9 +63,9 @@ export class Lexer {
       .map((v) => (v === "in" ? "&" : v)); // Alias
   }
 
-  static tokenlizeLine(source: string) {
-    const lexer = new Lexer(source);
-    lexer.run(source);
+  static tokenlizeLine(line: string) {
+    const lexer = new Lexer(line);
+    lexer.run(line);
     return lexer.tokens;
   }
 }

@@ -1,0 +1,159 @@
+[
+  {
+    "type": "comment",
+    "content": " max 10 persons, and 202203 must has 3 persons."
+  },
+  {
+    "type": "must",
+    "expr": {
+      "type": "<",
+      "left": {
+        "type": "union-to-int",
+        "from": {
+          "type": "id",
+          "name": "before",
+          "valueType": "union"
+        },
+        "valueType": "int"
+      },
+      "right": {
+        "type": "numeric-literal",
+        "value": 10,
+        "valueType": "int"
+      },
+      "valueType": "boolean"
+    }
+  },
+  {
+    "type": "must",
+    "expr": {
+      "type": "int-to-boolean",
+      "from": {
+        "type": "union-to-int",
+        "from": {
+          "type": "&",
+          "valueType": "union",
+          "left": {
+            "type": "id",
+            "name": "new",
+            "valueType": "union"
+          },
+          "right": {
+            "type": "union-literal",
+            "value": 2022,
+            "valueType": "union"
+          }
+        },
+        "valueType": "int"
+      },
+      "valueType": "boolean"
+    }
+  },
+  {
+    "type": "just",
+    "expr": {
+      "type": "int-to-boolean",
+      "from": {
+        "type": "union-to-int",
+        "from": {
+          "type": "&",
+          "valueType": "union",
+          "left": {
+            "type": "id",
+            "name": "new",
+            "valueType": "union"
+          },
+          "right": {
+            "type": "union-literal",
+            "value": 202203,
+            "valueType": "union"
+          }
+        },
+        "valueType": "int"
+      },
+      "valueType": "boolean"
+    }
+  },
+  {
+    "type": "assignment",
+    "id": "a",
+    "expr": {
+      "type": "&",
+      "valueType": "union",
+      "left": {
+        "type": "id",
+        "name": "before",
+        "valueType": "union"
+      },
+      "right": {
+        "type": "union-literal",
+        "value": 202203,
+        "valueType": "union"
+      }
+    }
+  },
+  {
+    "type": "assignment",
+    "id": "b",
+    "expr": {
+      "type": "-",
+      "valueType": "int",
+      "left": {
+        "type": "+",
+        "valueType": "int",
+        "left": {
+          "type": "union-to-int",
+          "from": {
+            "type": "id",
+            "name": "a",
+            "valueType": "union"
+          },
+          "valueType": "int"
+        },
+        "right": {
+          "type": "numeric-literal",
+          "value": 10,
+          "valueType": "int"
+        }
+      },
+      "right": {
+        "type": "union-to-int",
+        "from": {
+          "type": "id",
+          "name": "before",
+          "valueType": "union"
+        },
+        "valueType": "int"
+      }
+    }
+  },
+  {
+    "type": "must",
+    "expr": {
+      "type": ">=",
+      "left": {
+        "type": "id",
+        "name": "b",
+        "valueType": "int"
+      },
+      "right": {
+        "type": "numeric-literal",
+        "value": 3,
+        "valueType": "int"
+      },
+      "valueType": "boolean"
+    }
+  },
+  {
+    "type": "comment",
+    "content": " ok!"
+  },
+  {
+    "type": "comment",
+    "content": ""
+  },
+  {
+    "type": "comment",
+    "content": "return -1+-1-+5==-7"
+  }
+]

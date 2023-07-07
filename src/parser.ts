@@ -31,46 +31,85 @@ interface AssignmentStatement {
   expr: ASTNode;
 }
 
-export type NodeType =
-  | "union-to-int"
-  | "int-to-boolean"
-  | "&&"
-  | "||"
-  | "+"
-  | "-"
-  | "&"
-  | "|"
-  | "=="
-  | "!="
-  | ">"
-  | "<"
-  | ">="
-  | "<="
-  | "!"
-  | "id"
-  | "numeric-literal"
-  | "union-literal";
-export type ASTNode = {
-  type: NodeType;
+// export type NodeType =
+//   | "union-to-int"
+//   | "int-to-boolean"
+//   | "&&"
+//   | "||"
+//   | "+"
+//   | "-"
+//   | "&"
+//   | "|"
+//   | "=="
+//   | "!="
+//   | ">"
+//   | "<"
+//   | ">="
+//   | "<="
+//   | "!"
+//   | "id"
+//   | "numeric-literal"
+//   | "union-literal";
+
+export type IdNode = { type: "id"; name: string };
+
+export type BooleanNode = {
+  valueType: "boolean";
+} & (
+  | { type: "&&" | "||"; left: BooleanNode; right: BooleanNode }
+  | { type: "int-to-boolean"; from: IntNode }
+  | { type: "!"; expr: BooleanNode }
+  | {
+      type: "==" | "!=" | ">" | "<" | ">=" | "<=";
+      left: IntNode;
+      right: IntNode;
+    }
+  | IdNode
+);
+
+export type IntNode = {
+  valueType: "int";
+} & (
+  | { type: "+" | "-"; left: IntNode; right: IntNode }
+  | { type: "union-to-int"; from: UnionNode }
+  | { type: "numeric-literal"; value: number }
+  | IdNode
+);
+
+export type UnionNode = {
+  valueType: "union";
+} & (
+  | { type: "&" | "|"; left: UnionNode; right: UnionNode }
+  | { type: "union-literal"; value: number }
+  | IdNode
+);
+
+export type UnknownNode = {
   valueType: ValueType;
-} & Record<string, any>;
+} & IdNode;
+
+export type ASTNode = BooleanNode | IntNode | UnionNode | UnknownNode;
 
 export class Parser {
-  ctx = {} as Record<string, ValueType>;
+  ctx = {
+    before: "union",
+    new: "union",
+    after: "union",
+  } as Record<string, ValueType>;
 
-  wantInt(from: ASTNode): ASTNode {
-    if (from.valueType === "int") return from;
+  wantInt(from: ASTNode): IntNode {
+    if (from.valueType === "int") return from as IntNode;
     if (from.valueType === "union") {
       return {
         type: "union-to-int",
-        from,
+        from: from as UnionNode,
         valueType: "int",
       };
     }
     throw new Error(`Cannot convert ${from.valueType} to int`);
   }
-  wantBoolean(from: ASTNode): ASTNode {
-    if (from.valueType === "boolean") return from;
+  wantBoolean(from: ASTNode): BooleanNode {
+    if (from.valueType === "boolean") return from as BooleanNode;
     if (from.valueType === "int" || from.valueType === "union") {
       return {
         type: "int-to-boolean",
@@ -80,13 +119,19 @@ export class Parser {
     }
     throw new Error(`Cannot convert ${from.valueType} to boolean`);
   }
-  wantUnion(from: ASTNode): ASTNode {
-    if (from.valueType === "union") return from;
+  wantUnion(from: ASTNode): UnionNode {
+    if (from.valueType === "union") return from as UnionNode;
     throw new Error(`Cannot convert ${from.valueType} to union`);
   }
 
   parseLine(line: string): Statement {
     line = line.trim();
+    if (line === "") {
+      return {
+        type: "comment",
+        content: "",
+      };
+    }
     if (line[0] === "#") {
       return {
         type: "comment",
@@ -116,16 +161,27 @@ export class Parser {
         expr,
       };
     }
-    throw new Error("unknown statement");
+    throw new Error(`unknown statement at: "${line}", tokens: ${tokens}`);
   }
 
   divide<const O extends string>(tokens: Token[], ops: O[]) {
-    const i = tokens.findIndex(
+    const i = tokens.findLastIndex(
       (v) => typeof v === "string" && ops.includes(v as O)
     );
     return i === -1
       ? ([null, null, null] as const)
       : ([tokens.slice(0, i), tokens[i] as O, tokens.slice(i + 1)] as const);
+    // for (const op of ops) {
+    //   const i = tokens.lastIndexOf(op);
+    //   if (i !== -1) {
+    //     return [
+    //       tokens.slice(0, i),
+    //       op as O,
+    //       tokens.slice(i + 1),
+    //     ] as const;
+    //   }
+    // }
+    // return [null, null, null] as const;
   }
 
   parse1(tokens: Token[]): ASTNode {
@@ -146,7 +202,7 @@ export class Parser {
     if (tokens[0] === "!") {
       return {
         type: "!",
-        value: this.wantBoolean(this.parse3(tokens.slice(1))),
+        expr: this.wantBoolean(this.parse3(tokens.slice(1))),
         valueType: "boolean",
       };
     }
@@ -169,7 +225,28 @@ export class Parser {
   }
 
   parse4(tokens: Token[]): ASTNode {
-    const [l, o, r] = this.divide(tokens, ["+", "-"]);
+    // Normalize tokens with unary operators
+
+    const normalized = [];
+    if (tokens[0] === "-") {
+      normalized.push(0);
+    }
+    for (let i = 0; i < tokens.length - 1; i++) {
+      if (tokens[i] === "-" && tokens[i + 1] === "+") {
+        normalized.push("-");
+        i++;
+        continue;
+      }
+      if (tokens[i] === "+" && tokens[i + 1] === "-") {
+        normalized.push("-");
+        i++;
+        continue;
+      }
+      normalized.push(tokens[i]);
+    }
+    normalized.push(tokens[tokens.length - 1]);
+
+    const [l, o, r] = this.divide(normalized, ["+", "-"]);
     if (l === null) {
       return this.parse5(tokens);
     }
@@ -218,6 +295,9 @@ export class Parser {
         };
       }
     }
+    if (!(token in this.ctx)) {
+      throw new Error(`unknown identifier: ${token}`);
+    }
     return {
       type: "id",
       name: token,
@@ -228,7 +308,7 @@ export class Parser {
   static parse(source: string) {
     const parser = new Parser();
     const lines = source.split("\n");
-    const ast = lines.map((line) => parser.parseLine(line)).filter(Boolean);
+    const ast = lines.map((line) => parser.parseLine(line));
     return ast;
   }
 }
