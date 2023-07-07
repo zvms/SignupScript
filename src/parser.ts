@@ -1,6 +1,6 @@
 import { Lexer, Token } from "./lexer.js";
 
-export type ValueType = "int" | "boolean" | "union";
+export type ValueTypeNames = "int" | "boolean" | "union";
 
 export type Statement =
   | CommentStatement
@@ -85,7 +85,7 @@ export type UnionNode = {
 );
 
 export type UnknownNode = {
-  valueType: ValueType;
+  valueType: ValueTypeNames;
 } & IdNode;
 
 export type ASTNode = BooleanNode | IntNode | UnionNode | UnknownNode;
@@ -95,7 +95,7 @@ export class Parser {
     before: "union",
     new: "union",
     after: "union",
-  } as Record<string, ValueType>;
+  } as Record<string, ValueTypeNames>;
 
   wantInt(from: ASTNode): IntNode {
     if (from.valueType === "int") return from as IntNode;

@@ -87,7 +87,8 @@ export class VM {
       case "!":
         return !(this.eval(node.expr) as boolean);
       case "id":
-        if(!(node.name in this.ctx)) throw new Error(`unknown variable: ${node.name}`);
+        if (!(node.name in this.ctx))
+          throw new Error(`unknown variable: ${node.name}`);
         return this.ctx[node.name];
       case "numeric-literal":
         return node.value;
@@ -116,6 +117,17 @@ export class VM {
       } else {
         throw e;
       }
+    }
+    return true;
+  }
+
+  static check(program: Statement[], students: Student[]): boolean {
+    const before = new Union(new Set(), new Set(), new Set());
+    for (const student of students) {
+      if (!VM.run(program, before, student)) {
+        return false;
+      }
+      before.students.add(student);
     }
     return true;
   }
