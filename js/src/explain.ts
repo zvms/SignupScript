@@ -1,4 +1,4 @@
-import { ASTNode, Statement } from "./parser.js";
+import { ASTNode, Parser, Statement } from "./parser.js";
 import { Union } from "./student.js";
 
 export function explainStatement(statement: Statement) {
@@ -10,7 +10,7 @@ export function explainStatement(statement: Statement) {
     case "return":
       return `返回${explainExpr(statement.expr)})`;
     case "assignment":
-      return `“${statement.id}”是${explainExpr(statement.expr)}`;
+      return `定义变量“${statement.id}”为${explainExpr(statement.expr)}`;
     case "comment":
       return "";
   }
@@ -23,9 +23,11 @@ export function explainExpr(node: ASTNode): string {
     case "numeric-literal":
       return `${node.value}`;
     case "|":
-      return `(要么${explainExpr(node.left)}要么${explainExpr(node.right)})`;
+      return `(要么${explainExpr(node.left)}要么${explainExpr(
+        node.right
+      )}的学生)`;
     case "&":
-      return `(既${explainExpr(node.left)}又${explainExpr(node.right)})`;
+      return `(既${explainExpr(node.left)}又${explainExpr(node.right)}的学生)`;
     case "id":
       return `属于“${node.name}”`;
     case "==":
@@ -51,7 +53,7 @@ export function explainExpr(node: ASTNode): string {
     case "||":
       return `(${explainExpr(node.left)}或${explainExpr(node.right)})`;
     case "union-to-int":
-      return `${explainExpr(node.from)}的人数`;
+      return `${explainExpr(node.from)}的学生人数`;
     case "int-to-boolean":
       return `${explainExpr(node.from)}大于0`;
     default:
@@ -86,4 +88,30 @@ function explainUnion(value: Union): string {
     result.push([...value.classes].join("/"));
   }
   return prefix + result.join("or");
+}
+
+export interface StatementExplaination {
+  type: "ok" | "error";
+  text: string;
+}
+
+export function explain(lines: string[]): StatementExplaination[] {
+  const explainations: StatementExplaination[] = [];
+  const parser = new Parser();
+  for (const line of lines) {
+    try {
+      const statement = parser.parseLine(line);
+      explainations.push({
+        type: "ok",
+        text: explainStatement(statement),
+      });
+    } catch (e) {
+      explainations.push({
+        type: "error",
+        text: e + "",
+      });
+    }
+  }
+
+  return explainations;
 }

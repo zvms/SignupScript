@@ -39,14 +39,14 @@ const program = Parser.parse(source);
 
 console.log(program);
 
-fs.writeFileSync("../example.ast.json", JSON.stringify(program, null, 2));
+fs.writeFileSync("../../example.ast.json", JSON.stringify(program, null, 2));
 
 
 const explaination = program.map((statement) => explainStatement(statement));
 
 console.log(explaination);
 
-fs.writeFileSync("../example.explaination.txt", explaination.join("\n"));
+fs.writeFileSync("../../example.explaination.txt", explaination.join("\n"));
 
 
 const result = VM.run(

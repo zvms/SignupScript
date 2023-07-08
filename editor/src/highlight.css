@@ -1,0 +1,24 @@
+.language-signup > .comment {
+  color: #6a9955;
+}
+.language-signup > .statement-keyword {
+  color: #c586c0;
+}
+.language-signup > .assignment-operator {
+  color: #cccccc;
+}
+.language-signup > .identifier {
+  color: #9cdcfe;
+}
+.language-signup > .operator {
+  color: #d4d4d4;
+}
+.language-signup > .union-literal {
+  color: #d16969;
+}
+.language-signup > .numeric-literal {
+  color: #b5cea8;
+}
+.language-signup > .error {
+  color: #ff0000;
+}

@@ -9,37 +9,37 @@ export type ValueType = Union | Student | boolean | number;
 export class VM {
   ctx: Record<string, ValueType> = {};
 
-  execute(node: Statement): void {
+  public execute(stmt: Statement): void {
     function returns(val: boolean): never {
       throw new ExecReturn(val);
     }
-    switch (node.type) {
+    switch (stmt.type) {
       case "comment":
         return;
       case "must":
-        if (!this.eval(node.expr)) {
+        if (!this.eval(stmt.expr)) {
           returns(false);
         }
         return;
       case "just":
-        if (this.eval(node.expr)) {
+        if (this.eval(stmt.expr)) {
           returns(true);
         }
         return;
       case "return":
-        const result = this.eval(node.expr);
+        const result = this.eval(stmt.expr);
         if (typeof result === "boolean") {
           returns(result);
         } else {
           throw new Error("return value must be boolean");
         }
       case "assignment":
-        this.ctx[node.id] = this.eval(node.expr);
+        this.ctx[stmt.id] = this.eval(stmt.expr);
         return;
     }
   }
 
-  eval(node: ASTNode): ValueType {
+  public eval(node: ASTNode): ValueType {
     switch (node.type) {
       case "union-to-int":
         return (this.eval(node.from) as Union).length;
@@ -102,7 +102,7 @@ export class VM {
     }
   }
 
-  static run(program: Statement[], before: Union, neo: Student) {
+  public static run(program: Statement[], before: Union, neo: Student) {
     const after = Union.addStudent(before, neo);
     const vm = new VM();
     vm.ctx = {
@@ -124,7 +124,7 @@ export class VM {
     return true;
   }
 
-  static check(program: Statement[], students: Student[]): boolean {
+  public static check(program: Statement[], students: Student[]): boolean {
     const before = new Union(new Set(), new Set(), new Set());
     for (const student of students) {
       if (!VM.run(program, before, student)) {

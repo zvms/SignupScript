@@ -29,7 +29,7 @@ class Union:
             return Union(set(), {literal}, set())
         if 1000_00_00 <= literal <= 9999_99_99:
             return Union(set(), set(), {literal})
-        raise ValueError(f"{literal} is not a valid union literal")
+        raise ValueError(f"\"{literal}\" 不是一个学生集合")
     
     @staticmethod
     def intersect(a: "Union", b: "Union") -> "Union":

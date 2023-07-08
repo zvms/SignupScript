@@ -32,14 +32,14 @@ metadata = {
     "neo": 20220304,
 }
 
-with open("../example.signup", "r") as file:
+with open("../../example.signup", "r") as file:
     source = file.read()
 
 program = Parser.parse(source)
 
 print(program)
 
-with open("../example.ast.json", "w") as file:
+with open("../../example.ast.json", "w") as file:
     json.dump(program, file, indent=2)
 
 result = VM.run(

@@ -8,7 +8,7 @@
     "sourceMap": true,
     "moduleResolution": "Node",
     "lib": ["ESNext"],
-    "types": ["node","antlr4"],
+    "types": ["node"],
     "strict": true,
     "esModuleInterop": true
   }

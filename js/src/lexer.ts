@@ -1,27 +1,28 @@
 export type Token = string | number;
 
 export class Lexer {
-  protected source: string;
-  constructor(source: string) {
-    this.source = source;
-  }
-  protected rawTokens: string[] = [];
+  public rawTokens: string[] = [];
   protected get lastRawToken() {
     return this.rawTokens[this.rawTokens.length - 1] ?? "";
   }
   protected set lastRawToken(token: string) {
     this.rawTokens[this.rawTokens.length - 1] = token;
   }
-  process(char: string) {
-    if (char === "&" || char === "|") {
-      if (this.rawTokens.at(-1) === char) {
-        this.lastRawToken = char + char;
+  protected process(char: string) {
+    if (char.trim().length === 0) {
+      if (
+        this.lastRawToken.trim().length === 0 &&
+        this.lastRawToken !== "" /**not the first token */
+      ) {
+        this.lastRawToken = this.lastRawToken + char;
       } else {
         this.rawTokens.push(char);
       }
-    } else if (char === " " || char === "\t") {
-      if (this.rawTokens.at(-1) !== " ") {
-        this.rawTokens.push(" ");
+    } else if (char === "&" || char === "|") {
+      if (this.lastRawToken === char) {
+        this.lastRawToken = char + char;
+      } else {
+        this.rawTokens.push(char);
       }
     } else if (char === "=") {
       const last = this.rawTokens.at(-1);
@@ -50,7 +51,7 @@ export class Lexer {
     }
   }
 
-  run(source: string) {
+  public run(source: string) {
     for (const c of source) {
       this.process(c);
     }
@@ -58,13 +59,13 @@ export class Lexer {
 
   public get tokens(): Token[] {
     return this.rawTokens
-      .filter((v) => v !== " ") // delete spaces
+      .filter((v) => v.trim().length > 0) // delete spaces
       .map((v) => (Number.isFinite(+v) ? +v : v)) // convert numeric to number type
       .map((v) => (v === "in" ? "&" : v)); // Alias
   }
 
-  static tokenlizeLine(line: string) {
-    const lexer = new Lexer(line);
+  public static tokenlizeLine(line: string) {
+    const lexer = new Lexer();
     lexer.run(line);
     return lexer.tokens;
   }

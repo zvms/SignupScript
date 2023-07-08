@@ -91,13 +91,13 @@ export type UnknownNode = {
 export type ASTNode = BooleanNode | IntNode | UnionNode | UnknownNode;
 
 export class Parser {
-  ctx = {
+  protected ctx = {
     before: "union",
     new: "union",
     after: "union",
   } as Record<string, ValueTypeNames>;
 
-  wantInt(from: ASTNode): IntNode {
+  protected wantInt(from: ASTNode): IntNode {
     if (from.valueType === "int") return from as IntNode;
     if (from.valueType === "union") {
       return {
@@ -106,9 +106,9 @@ export class Parser {
         valueType: "int",
       };
     }
-    throw new Error(`Cannot convert ${from.valueType} to int`);
+    throw new Error(`不能将 ${from.valueType} 转换为整数。`);
   }
-  wantBoolean(from: ASTNode): BooleanNode {
+  protected wantBoolean(from: ASTNode): BooleanNode {
     if (from.valueType === "boolean") return from as BooleanNode;
     if (from.valueType === "int" || from.valueType === "union") {
       return {
@@ -117,14 +117,14 @@ export class Parser {
         valueType: "boolean",
       };
     }
-    throw new Error(`Cannot convert ${from.valueType} to boolean`);
+    throw new Error(`不能将 ${from.valueType} 转换为布尔类型`);
   }
-  wantUnion(from: ASTNode): UnionNode {
+  protected wantUnion(from: ASTNode): UnionNode {
     if (from.valueType === "union") return from as UnionNode;
-    throw new Error(`Cannot convert ${from.valueType} to union`);
+    throw new Error(`不能将${from.valueType}转换为学生集合`);
   }
 
-  parseLine(line: string): Statement {
+  public parseLine(line: string): Statement {
     line = line.trim();
     if (line === "") {
       return {
@@ -151,7 +151,7 @@ export class Parser {
     if (tokens[1] === "=") {
       const id = tokens[0];
       if (typeof id !== "string" || !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(id)) {
-        throw new Error(`invalid identifier: ${id}`);
+        throw new Error(`不合适的变量名: ${id}`);
       }
       const expr = this.parse1(tokens.slice(2));
       this.ctx[id] = expr.valueType;
@@ -161,30 +161,19 @@ export class Parser {
         expr,
       };
     }
-    throw new Error(`unknown statement at: "${line}", tokens: ${tokens}`);
+    throw new Error(`不能识别该语句`);
   }
 
-  divide<const O extends string>(tokens: Token[], ops: O[]) {
+  protected divide<const O extends string>(tokens: Token[], ops: O[]) {
     const i = tokens.findLastIndex(
       (v) => typeof v === "string" && ops.includes(v as O)
     );
     return i === -1
       ? ([null, null, null] as const)
       : ([tokens.slice(0, i), tokens[i] as O, tokens.slice(i + 1)] as const);
-    // for (const op of ops) {
-    //   const i = tokens.lastIndexOf(op);
-    //   if (i !== -1) {
-    //     return [
-    //       tokens.slice(0, i),
-    //       op as O,
-    //       tokens.slice(i + 1),
-    //     ] as const;
-    //   }
-    // }
-    // return [null, null, null] as const;
   }
 
-  parse1(tokens: Token[]): ASTNode {
+  protected parse1(tokens: Token[]): ASTNode {
     const [l, o, r] = this.divide(tokens, ["&&", "||"]);
     if (l === null) {
       return this.parse2(tokens);
@@ -198,7 +187,7 @@ export class Parser {
     }
   }
 
-  parse2(tokens: Token[]): ASTNode {
+  protected parse2(tokens: Token[]): ASTNode {
     if (tokens[0] === "!") {
       return {
         type: "!",
@@ -208,7 +197,7 @@ export class Parser {
     }
     return this.parse3(tokens);
   }
-  parse3(tokens: Token[]): ASTNode {
+  protected parse3(tokens: Token[]): ASTNode {
     const [l, o, r] = this.divide(tokens, ["==", "!=", ">", "<", ">=", "<="]);
     if (l === null) {
       return this.parse4(tokens);
@@ -224,9 +213,8 @@ export class Parser {
     }
   }
 
-  parse4(tokens: Token[]): ASTNode {
+  protected parse4(tokens: Token[]): ASTNode {
     // Normalize tokens with unary operators
-
     const normalized = [];
     if (tokens[0] === "-") {
       normalized.push(0);
@@ -260,7 +248,7 @@ export class Parser {
     };
   }
 
-  parse5(tokens: Token[]): ASTNode {
+  protected parse5(tokens: Token[]): ASTNode {
     const [l, o, r] = this.divide(tokens, ["|", "&"]);
     if (l === null) {
       return this.parse6(tokens);
@@ -275,9 +263,9 @@ export class Parser {
     };
   }
 
-  parse6(tokens: Token[]): ASTNode {
+  protected parse6(tokens: Token[]): ASTNode {
     if (tokens.length !== 1) {
-      throw new Error("error when parsing " + tokens.join(""));
+      throw new Error(`解析失败: ${formatTokens(tokens)}`);
     }
     const token = tokens[0];
     if (typeof token === "number") {
@@ -296,19 +284,23 @@ export class Parser {
       }
     }
     if (!(token in this.ctx)) {
-      throw new Error(`unknown identifier: ${token}`);
+      throw new Error(`未定义的变量: ${token}`);
     }
     return {
       type: "id",
       name: token,
-      valueType: this.ctx[token] ?? "undefined",
+      valueType: this.ctx[token] ?? "err",
     };
   }
 
-  static parse(source: string) {
+  public static parse(source: string): Statement[] {
     const parser = new Parser();
     const lines = source.split("\n");
     const ast = lines.map((line) => parser.parseLine(line));
     return ast;
   }
+}
+
+export function formatTokens(tokens: Token[]) {
+  return tokens.map((v) => `"${v}"`).join(", ");
 }

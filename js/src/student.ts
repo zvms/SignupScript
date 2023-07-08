@@ -36,7 +36,7 @@ export class Union {
     if (1000_00_00 <= literal && literal <= 9999_99_99) {
       return new Union(new Set(), new Set(), new Set([literal]));
     }
-    throw new Error(`${literal} is not a valid union literal`);
+    throw new Error(`"${literal}" 不是一个学生集合`);
   }
 
   static intersect(a: Union, b: Union): Union {
