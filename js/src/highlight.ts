@@ -32,8 +32,6 @@ export function highlightStatement(line: string) {
   lexer.run(line);
   const tokens = lexer.rawTokens;
 
-  console.log(tokens);
-
   let realTokenNum = 0;
 
   const tokenTypes: TokenType[] = tokens.map((token, idx): TokenType => {

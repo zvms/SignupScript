@@ -7,10 +7,10 @@ export const conv = {
     return Math.floor(s / 100);
   },
   gradeOfStudent(s: Student): Grade {
-    return Math.floor(s / 10) % 10;
+    return Math.floor(s / 100_00);
   },
   gradeOfClass(c: Class): Grade {
-    return Math.floor(c / 10) % 10;
+    return Math.floor(c / 100);
   },
 };
 
@@ -22,7 +22,10 @@ export class Union {
   ) {}
 
   get length(): number {
-    return 0;
+    if (this.grades.size !== 0 || this.classes.size !== 0) {
+      throw new Error("不能对年级或班级求长度");
+    }
+    return this.students.size;
   }
 
   static fromLiteral(literal: number): Union {
@@ -54,6 +57,11 @@ export class Union {
         classes.add(classA);
       }
     }
+    for (const classB of b.classes) {
+      if (a.grades.has(conv.gradeOfClass(classB))) {
+        classes.add(classB);
+      }
+    }
     const students = new Set<Student>();
     for (const studentA of a.students) {
       if (b.students.has(studentA)) {
@@ -62,6 +70,13 @@ export class Union {
         students.add(studentA);
       } else if (b.grades.has(conv.gradeOfStudent(studentA))) {
         students.add(studentA);
+      }
+    }
+    for (const studentB of a.students) {
+      if (a.classes.has(conv.classOfStudent(studentB))) {
+        students.add(studentB);
+      } else if (a.grades.has(conv.gradeOfStudent(studentB))) {
+        students.add(studentB);
       }
     }
     return new Union(grades, classes, students);

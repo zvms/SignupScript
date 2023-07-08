@@ -8,7 +8,7 @@ export function explainStatement(statement: Statement) {
     case "just":
       return `只要${explainExpr(statement.expr)}就可以报名`;
     case "return":
-      return `返回${explainExpr(statement.expr)})`;
+      return `可否报名由${explainExpr(statement.expr)}决定`;
     case "assignment":
       return `定义变量“${statement.id}”为${explainExpr(statement.expr)}`;
     case "comment":

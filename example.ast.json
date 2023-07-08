@@ -120,7 +120,7 @@
         "type": "union-to-int",
         "from": {
           "type": "id",
-          "name": "before",
+          "name": "after",
           "valueType": "union"
         },
         "valueType": "int"

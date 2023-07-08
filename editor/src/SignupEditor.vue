@@ -27,7 +27,24 @@ export default {
   },
   computed: {
     explainations() {
-      return explain(this.modelValue.split("\n"));
+      return explain(this.modelValue.split("\n")).map(({ text, type }) => {
+        let i = 0;
+        let s = "";
+        for (const c of text) {
+          if (c == "(") {
+            i++;
+            s += `<span class="bracket-${(i % 3) + 1}">(</span>`;
+            continue;
+          }
+          if (c == ")") {
+            s += `<span class="bracket-${(i % 3) + 1}">)</span>`;
+            i--;
+            continue;
+          }
+          s += c;
+        }
+        return { text: s + "<br/>", type };
+      });
     },
     highlighted() {
       return highlight(this.modelValue.split("\n")).join("\n");
@@ -63,9 +80,8 @@ export default {
         <span
           v-for="explain in explainations"
           :class="`explain-${explain.type}`"
+          v-html="explain.text"
         >
-          {{ explain.text }}
-          <br />
         </span>
       </div>
     </div>

@@ -102,7 +102,8 @@ export class VM {
     }
   }
 
-  public static run(program: Statement[], before: Union, neo: Student) {
+  public static run(program: Statement[], present: Student[], neo: Student) {
+    const before = new Union(new Set(), new Set(), new Set(present));
     const after = Union.addStudent(before, neo);
     const vm = new VM();
     vm.ctx = {
@@ -125,12 +126,12 @@ export class VM {
   }
 
   public static check(program: Statement[], students: Student[]): boolean {
-    const before = new Union(new Set(), new Set(), new Set());
+    const present = []
     for (const student of students) {
-      if (!VM.run(program, before, student)) {
+      if (!VM.run(program, present, student)) {
         return false;
       }
-      before.students.add(student);
+      present.push(student);
     }
     return true;
   }

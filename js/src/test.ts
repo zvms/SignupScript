@@ -33,7 +33,7 @@ const metadata = {
   neo: 20220304,
 };
 
-const source = fs.readFileSync("../example.signup", "utf-8");
+const source = fs.readFileSync("../../example.signup", "utf-8");
 
 const program = Parser.parse(source);
 
@@ -41,18 +41,12 @@ console.log(program);
 
 fs.writeFileSync("../../example.ast.json", JSON.stringify(program, null, 2));
 
-
 const explaination = program.map((statement) => explainStatement(statement));
 
 console.log(explaination);
 
 fs.writeFileSync("../../example.explaination.txt", explaination.join("\n"));
 
-
-const result = VM.run(
-  program,
-  new Union(new Set([20220101, 20220203, 20220303]), new Set(), new Set()),
-  20220304
-);
+const result = VM.run(program, [20220101, 20220203, 20220303], 20220304);
 
 console.log(result);
