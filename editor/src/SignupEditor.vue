@@ -27,27 +27,32 @@ export default {
   },
   computed: {
     explainations() {
-      return explain(this.modelValue.split("\n")).map(({ text, type }) => {
-        let i = 0;
-        let s = "";
-        for (const c of text) {
-          if (c == "(") {
-            i++;
-            s += `<span class="bracket-${(i % 3) + 1}">(</span>`;
-            continue;
+      return explain(this.modelValue.split("\n"))
+        .map(({ text, type }) => {
+          let i = 0;
+          let s = "";
+          for (const c of text) {
+            if (c == "(") {
+              i++;
+              s += `<span class="bracket-${(i % 3) + 1}">(</span>`;
+              continue;
+            }
+            if (c == ")") {
+              s += `<span class="bracket-${(i % 3) + 1}">)</span>`;
+              i--;
+              continue;
+            }
+            s += c;
           }
-          if (c == ")") {
-            s += `<span class="bracket-${(i % 3) + 1}">)</span>`;
-            i--;
-            continue;
-          }
-          s += c;
-        }
-        return { text: s + "<br/>", type };
-      });
+          return { text: s + "<br/>", type };
+        })
+        .concat([{ text: "运行至此则允许报名", type: "tip" }]);
     },
     highlighted() {
-      return highlight(this.modelValue.split("\n")).join("\n");
+      return (
+        highlight(this.modelValue.split("\n")).join("\n") +
+        `\n<span style="color:grey">return 1</span>`
+      );
     },
   },
 };
@@ -60,6 +65,7 @@ export default {
         {{ i + 1 }}
         <br />
       </span>
+      END<br />
     </div>
     <div class="container">
       <div class="script-source">
@@ -156,5 +162,8 @@ export default {
 }
 .explain-error {
   color: red;
+}
+.explain-tip {
+  color: grey;
 }
 </style>

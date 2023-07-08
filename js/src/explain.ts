@@ -91,7 +91,7 @@ function explainUnion(value: Union): string {
 }
 
 export interface StatementExplaination {
-  type: "ok" | "error";
+  type: "ok" | "error" | "tip";
   text: string;
 }
 
