@@ -1,4 +1,6 @@
 .antlr
+__pycache__
+.vscode
 
 # Logs
 logs

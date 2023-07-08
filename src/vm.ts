@@ -20,10 +20,12 @@ export class VM {
         if (!this.eval(node.expr)) {
           returns(false);
         }
+        return;
       case "just":
         if (this.eval(node.expr)) {
           returns(true);
         }
+        return;
       case "return":
         const result = this.eval(node.expr);
         if (typeof result === "boolean") {
@@ -33,6 +35,7 @@ export class VM {
         }
       case "assignment":
         this.ctx[node.id] = this.eval(node.expr);
+        return;
     }
   }
 
@@ -100,7 +103,7 @@ export class VM {
   }
 
   static run(program: Statement[], before: Union, neo: Student) {
-    const after = Union.addStudnet(before, neo);
+    const after = Union.addStudent(before, neo);
     const vm = new VM();
     vm.ctx = {
       before,

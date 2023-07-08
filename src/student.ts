@@ -60,6 +60,8 @@ export class Union {
         students.add(studentA);
       } else if (b.classes.has(conv.classOfStudent(studentA))) {
         students.add(studentA);
+      } else if (b.grades.has(conv.gradeOfStudent(studentA))) {
+        students.add(studentA);
       }
     }
     return new Union(grades, classes, students);
@@ -71,7 +73,7 @@ export class Union {
       new Set([...a.students, ...b.students])
     );
   }
-  static addStudnet(u: Union, s: Student): Union {
+  static addStudent(u: Union, s: Student): Union {
     return new Union(
       new Set(u.grades),
       new Set(u.classes),
