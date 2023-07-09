@@ -13,7 +13,7 @@ must before < 10
 must new in 2022
 just new in 202203
 a = before in 202203
-b = a + 10 - before
+b = a + 10 - after
 must b >= 3
 # ok!
 
