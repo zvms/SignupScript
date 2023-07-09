@@ -1,6 +1,6 @@
 import { Lexer, type Token } from "./lexer.js";
 
-type TokenType =
+export type TokenType =
   | "none"
   | "comment"
   | "statement-keyword"
@@ -9,6 +9,8 @@ type TokenType =
   | "identifier"
   | "union-literal"
   | "numeric-literal"
+  | "type-convertor"
+  | "belong-to"
   | "error";
 
 export function highlight(lines: string[]): string[] {
@@ -31,6 +33,7 @@ export function highlightStatement(line: string) {
   const lexer = new Lexer();
   lexer.run(line);
   const tokens = lexer.rawTokens;
+  const comment = lexer.comment;
 
   let realTokenNum = 0;
 
@@ -82,12 +85,15 @@ export function highlightStatement(line: string) {
     return "error";
   });
 
-  return tokens
-    .map((token, idx) => {
-      const tokenType = tokenTypes[idx];
-      return tokenType === "none"
-        ? token
-        : `<span class="${tokenType}">${token}</span>`;
-    })
-    .join("");
+  return (
+    tokens
+      .map((token, idx) => {
+        const tokenType = tokenTypes[idx];
+        return tokenType === "none"
+          ? token
+          : `<span class="${tokenType}">${token}</span>`;
+      })
+      .join("") +
+    (comment === null ? "" : `<span class="comment">#${comment}</span>`)
+  );
 }

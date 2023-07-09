@@ -1,34 +1,39 @@
-.language-signup > .comment {
+.language-signup .comment {
   color: #6a9955;
 }
-.language-signup > .statement-keyword {
+.language-signup .statement-keyword {
   color: #c586c0;
 }
-.language-signup > .assignment-operator {
+.language-signup .assignment-operator {
   color: #cccccc;
 }
-.language-signup > .identifier {
+.language-signup .identifier {
   color: #9cdcfe;
 }
-.language-signup > .operator {
+.language-signup .operator {
   color: #d4d4d4;
 }
-.language-signup > .union-literal {
+.language-signup .union-literal {
   color: #d16969;
 }
-.language-signup > .numeric-literal {
+.language-signup .numeric-literal {
   color: #b5cea8;
 }
-.language-signup > .error {
+.language-signup .type-convertor {
+  color: #dcdcaa;
+}
+.language-signup .belong-to {
+  color: 	#CE9178;
+}
+.language-signup .error {
   color: #ff0000;
 }
-
-.bracket-1 {
+.language-signup .bracket-1 {
   color: #ffd700;
 }
-.bracket-2 {
+.language-signup .bracket-2 {
   color: #da70d6;
 }
-.bracket-3 {
+.language-signup .bracket-3 {
   color: #179fff;
 }

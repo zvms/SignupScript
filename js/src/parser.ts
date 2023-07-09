@@ -3,12 +3,16 @@ import { Lexer, Token } from "./lexer.js";
 export type ValueTypeNames = "int" | "boolean" | "union";
 
 export type Statement =
+  | BlankStatement
   | CommentStatement
   | MustStatement
   | JustStatement
   | ReturnStatement
   | AssignmentStatement;
 
+interface BlankStatement {
+  type: "blank";
+}
 interface CommentStatement {
   type: "comment";
   content: string;
@@ -16,19 +20,23 @@ interface CommentStatement {
 interface MustStatement {
   type: "must";
   expr: ASTNode;
+  comment: string | null;
 }
 interface JustStatement {
   type: "just";
   expr: ASTNode;
+  comment: string | null;
 }
 interface ReturnStatement {
   type: "return";
   expr: ASTNode;
+  comment: string | null;
 }
 interface AssignmentStatement {
   type: "assignment";
   id: string;
   expr: ASTNode;
+  comment: string | null;
 }
 
 // export type NodeType =
@@ -128,8 +136,7 @@ export class Parser {
     line = line.trim();
     if (line === "") {
       return {
-        type: "comment",
-        content: "",
+        type: "blank",
       };
     }
     if (line[0] === "#") {
@@ -138,7 +145,7 @@ export class Parser {
         content: line.slice(1),
       };
     }
-    const tokens = Lexer.tokenlizeLine(line);
+    const [tokens, comment] = Lexer.tokenlizeLine(line);
     if (
       typeof tokens[0] === "string" &&
       ["must", "just", "return"].includes(tokens[0])
@@ -146,6 +153,7 @@ export class Parser {
       return {
         type: tokens[0] as "must" | "just" | "return",
         expr: this.wantBoolean(this.parse1(tokens.slice(1))),
+        comment,
       };
     }
     if (tokens[1] === "=") {
@@ -159,6 +167,7 @@ export class Parser {
         type: "assignment",
         id,
         expr,
+        comment,
       };
     }
     throw new Error(`不能识别该语句`);
@@ -249,12 +258,27 @@ export class Parser {
   }
 
   protected parse5(tokens: Token[]): ASTNode {
-    const [l, o, r] = this.divide(tokens, ["|", "&"]);
+    const [l, o, r] = this.divide(tokens, ["in"]);
     if (l === null) {
       return this.parse6(tokens);
     }
     const left = this.wantUnion(this.parse5(l));
     const right = this.wantUnion(this.parse6(r));
+    return {
+      type: "&",
+      valueType: "union",
+      left,
+      right,
+    };
+  }
+
+  protected parse6(tokens: Token[]): ASTNode {
+    const [l, o, r] = this.divide(tokens, ["|", "&"]);
+    if (l === null) {
+      return this.parse7(tokens);
+    }
+    const left = this.wantUnion(this.parse6(l));
+    const right = this.wantUnion(this.parse7(r));
     return {
       type: o,
       valueType: "union",
@@ -263,7 +287,7 @@ export class Parser {
     };
   }
 
-  protected parse6(tokens: Token[]): ASTNode {
+  protected parse7(tokens: Token[]): ASTNode {
     if (tokens.length !== 1) {
       throw new Error(`解析失败: ${formatTokens(tokens)}`);
     }

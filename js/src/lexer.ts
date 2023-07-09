@@ -1,7 +1,10 @@
 export type Token = string | number;
 
+class CommentException {}
+
 export class Lexer {
   public rawTokens: string[] = [];
+  public comment = null as string | null;
   protected get lastRawToken() {
     return this.rawTokens[this.rawTokens.length - 1] ?? "";
   }
@@ -18,6 +21,8 @@ export class Lexer {
       } else {
         this.rawTokens.push(char);
       }
+    } else if (char === "#") {
+      throw new CommentException();
     } else if (char === "&" || char === "|") {
       if (this.lastRawToken === char) {
         this.lastRawToken = char + char;
@@ -52,21 +57,30 @@ export class Lexer {
   }
 
   public run(source: string) {
-    for (const c of source) {
-      this.process(c);
+    for (let i = 0; i < source.length; i++) {
+      const c = source[i];
+      try {
+        this.process(c);
+      } catch (e) {
+        if (e instanceof CommentException) {
+          this.comment = source.slice(i + 1);
+          break;
+        } else {
+          throw e;
+        }
+      }
     }
   }
 
   public get tokens(): Token[] {
     return this.rawTokens
       .filter((v) => v.trim().length > 0) // delete spaces
-      .map((v) => (Number.isFinite(+v) ? +v : v)) // convert numeric to number type
-      .map((v) => (v === "in" ? "&" : v)); // Alias
+      .map((v) => (Number.isFinite(+v) ? +v : v)); // convert numeric to number type
   }
 
   public static tokenlizeLine(line: string) {
     const lexer = new Lexer();
     lexer.run(line);
-    return lexer.tokens;
+    return [lexer.tokens, lexer.comment] as const;
   }
 }

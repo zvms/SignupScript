@@ -24,13 +24,13 @@ must b >= 3
   },
   computed: {
     result() {
-      try{
-      return VM.run(
-        Parser.parse(this.src),
-        this.present.split(",").map((x) => +x.trim()),
-        this.neo
-      );
-      }catch(e){
+      try {
+        return VM.run(
+          Parser.parse(this.src),
+          this.present.split(",").map((x) => +x.trim()),
+          this.neo
+        );
+      } catch (e) {
         return e;
       }
     },
@@ -42,10 +42,7 @@ must b >= 3
   <main>
     <h1>SignupScript Playground</h1>
     <VForm>
-      <VTextarea
-        label="已报名"
-        v-model="present"
-      />
+      <VTextarea label="已报名" v-model="present" />
       <VTextField label="新报名" v-model.number="neo" />
     </VForm>
     <SignupEditor v-model="src" />

@@ -24,6 +24,12 @@ export default {
       const source = (ev.target as HTMLTextAreaElement).value;
       this.$emit("update:modelValue", source);
     },
+    syncScroll() {
+      const input = this.$refs.inputElement as HTMLTextAreaElement;
+      const output = this.$refs.outputElement as HTMLPreElement;
+      output.scrollTop = input.scrollTop;
+      output.scrollLeft = input.scrollLeft;
+    },
   },
   computed: {
     explainations() {
@@ -69,10 +75,16 @@ export default {
     </div>
     <div class="container">
       <div class="script-source">
-        <pre v-html="highlighted" class="script-output language-signup"></pre>
+        <pre
+          v-html="highlighted"
+          class="script-output language-signup"
+          ref="outputElement"
+        ></pre>
         <textarea
           :value="modelValue"
           @input="onInput"
+          @scroll="syncScroll
+          "
           class="script-input"
           autocomplete="off"
           autocorrect="off"
@@ -85,7 +97,9 @@ export default {
       <div class="px-2 py-0 script-explain">
         <span
           v-for="explain in explainations"
-          :class="`explain-${explain.type}`"
+          :class="`explain-${explain.type} ${
+            explain.type == 'ok' ? 'language-signup' : ''
+          }`"
           v-html="explain.text"
         >
         </span>
@@ -109,6 +123,7 @@ export default {
 .line-num {
   color: RGB(110, 118, 129);
   font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace !important;
+  user-select: none;
 }
 
 .container {
