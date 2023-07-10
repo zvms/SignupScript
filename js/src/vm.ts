@@ -1,4 +1,4 @@
-import { type ASTNode, type Statement } from "./parser.js";
+import { type ASTNode, type Statement, type Program } from "./parser.js";
 import { Student, Union } from "./student.js";
 
 class ExecReturn {
@@ -102,7 +102,7 @@ export class VM {
     }
   }
 
-  public static run(program: Statement[], present: Student[], neo: Student) {
+  public static run(program: Program, present: Student[], neo: Student) {
     const before = new Union(new Set(), new Set(), new Set(present));
     const after = Union.addStudent(before, neo);
     const vm = new VM();
@@ -125,8 +125,8 @@ export class VM {
     return true;
   }
 
-  public static check(program: Statement[], students: Student[]): boolean {
-    const present = []
+  public static check(program: Program, students: Student[]): boolean {
+    const present = [];
     for (const student of students) {
       if (!VM.run(program, present, student)) {
         return false;

@@ -2,6 +2,8 @@ import { Lexer, Token } from "./lexer.js";
 
 export type ValueTypeNames = "int" | "boolean" | "union";
 
+export type Program = Statement[];
+
 export type Statement =
   | BlankStatement
   | CommentStatement
@@ -317,7 +319,7 @@ export class Parser {
     };
   }
 
-  public static parse(source: string): Statement[] {
+  public static parse(source: string): Program {
     const parser = new Parser();
     const lines = source.split("\n");
     const ast = lines.map((line) => parser.parseLine(line));
